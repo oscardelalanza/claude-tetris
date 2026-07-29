@@ -16,6 +16,7 @@ const COLORS = [
   '#f06292', // R - ring (pink)
   '#ffab40', // bomb (amber)
   '#5c6bc0', // gravity (indigo)
+  '#00e676', // ray (laser green)
 ];
 
 const PIECES = [
@@ -30,6 +31,7 @@ const PIECES = [
   [[8,8,8],[8,0,8],[8,8,8]],                  // R - ring
   [[9]],                                       // bomb
   [[10]],                                      // gravity
+  [[11]],                                      // ray
 ];
 
 const LINE_SCORES = [0, 100, 300, 500, 800];
@@ -39,6 +41,8 @@ const BOMB_TYPE = 9;
 const BOMB_LINE_INTERVAL = 10;
 const GRAVITY_TYPE = 10;
 const GRAVITY_LINE_INTERVAL = 15;
+const RAY_TYPE = 11;
+const RAY_LINE_INTERVAL = 20;
 
 const canvas = document.getElementById('board');
 const ctx = canvas.getContext('2d');
@@ -57,6 +61,7 @@ let board, current, next, score, lines, level, paused, gameOver, lastTime, dropA
 let gridColor;
 let bombPending;
 let gravityPending;
+let rayPending;
 
 const THEME_KEY = 'tetris-theme';
 
@@ -111,6 +116,10 @@ function getNextPiece() {
   if (gravityPending) {
     gravityPending = false;
     return specialPiece(GRAVITY_TYPE);
+  }
+  if (rayPending) {
+    rayPending = false;
+    return specialPiece(RAY_TYPE);
   }
   return randomPiece();
 }
@@ -178,6 +187,9 @@ function clearLines() {
     if (Math.floor(lines / GRAVITY_LINE_INTERVAL) > Math.floor(prevLines / GRAVITY_LINE_INTERVAL)) {
       gravityPending = true;
     }
+    if (Math.floor(lines / RAY_LINE_INTERVAL) > Math.floor(prevLines / RAY_LINE_INTERVAL)) {
+      rayPending = true;
+    }
     updateHUD();
   }
 }
@@ -189,6 +201,13 @@ function detonate() {
       const nx = current.x + dc;
       if (ny >= 0 && ny < ROWS && nx >= 0 && nx < COLS) board[ny][nx] = 0;
     }
+}
+
+function fireRay() {
+  const row = current.y;
+  const col = current.x;
+  for (let c = 0; c < COLS; c++) board[row][c] = 0;
+  for (let r = 0; r < ROWS; r++) board[r][col] = 0;
 }
 
 function applyGravity() {
@@ -229,6 +248,8 @@ function lockPiece() {
     detonate();
   } else if (current.type === GRAVITY_TYPE) {
     applyGravity();
+  } else if (current.type === RAY_TYPE) {
+    fireRay();
   } else {
     merge();
   }
@@ -287,6 +308,16 @@ function drawBlock(context, x, y, colorIndex, size, alpha) {
     context.lineTo(cx, cy + size * 0.24);
     context.closePath();
     context.fill();
+  } else if (colorIndex === RAY_TYPE) {
+    const cx = x * size + size / 2, cy = y * size + size / 2;
+    context.strokeStyle = '#004d26';
+    context.lineWidth = Math.max(1, size * 0.08);
+    context.beginPath();
+    context.moveTo(cx - size * 0.3, cy);
+    context.lineTo(cx + size * 0.3, cy);
+    context.moveTo(cx, cy - size * 0.3);
+    context.lineTo(cx, cy + size * 0.3);
+    context.stroke();
   }
   context.globalAlpha = 1;
 }
@@ -393,6 +424,7 @@ function init() {
   dropAccum = 0;
   bombPending = false;
   gravityPending = false;
+  rayPending = false;
   lastTime = performance.now();
   next = getNextPiece();
   spawn();

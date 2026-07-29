@@ -43,6 +43,7 @@ Es una versión jugable del Tetris clásico con todas las mecánicas que esperar
 - **Niveles** que aumentan cada 10 líneas y aceleran la caída.
 - **Powerup explosivo** 💣: cada 10 líneas eliminadas aparece una pieza especial que, al caer, destruye un área de 3×3 celdas en el punto donde aterriza.
 - **Powerup de gravedad**: cada 15 líneas eliminadas aparece una pieza especial que, al caer, compacta todos los huecos del tablero (cada columna cae hasta el fondo).
+- **Powerup de rayo** ⚡: cada 20 líneas eliminadas aparece una pieza especial que, al caer, vacía por completo la fila y la columna donde aterriza.
 - **Pausa** y **Game Over** con opción de reinicio.
 
 ---
@@ -180,6 +181,7 @@ Algunos parámetros fáciles de tunear en `game.js`:
 | `dropInterval` | Velocidad inicial de caída en ms         | `1000`                |
 | `BOMB_LINE_INTERVAL` | Líneas eliminadas entre apariciones de la pieza explosiva | `10` |
 | `GRAVITY_LINE_INTERVAL` | Líneas eliminadas entre apariciones de la pieza de gravedad | `15` |
+| `RAY_LINE_INTERVAL` | Líneas eliminadas entre apariciones de la pieza de rayo | `20` |
 | `RING_SPAWN_WEIGHT` | Peso relativo de la pieza anillo frente a cada pieza estándar (peso `1`) al elegir pieza aleatoria | `0.25` |
 
 > Si cambias `COLS`, `ROWS` o `BLOCK`, recuerda ajustar también `width` y `height` del `<canvas id="board">` en `index.html` para que coincida (`COLS × BLOCK` × `ROWS × BLOCK`).
