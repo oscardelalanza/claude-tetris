@@ -19,6 +19,14 @@ const COLORS = [
   '#00e676', // ray (laser green)
 ];
 
+const SKINS = {
+  retro:  { colors: COLORS, glow: false, rounded: false, pattern: false },
+  neon:   { colors: [null,'#00e5ff','#ffee00','#e040fb','#00ff6a','#ff3d3d','#40c4ff','#ff9100','#ff1493','#ffd600','#7c4dff','#00ff9c'], glow: true,  rounded: false, pattern: false },
+  pastel: { colors: [null,'#a7e8e0','#fff2b2','#dcc6f0','#c3ecc0','#f5b8b8','#c3e6f7','#ffd8ae','#f6b8d0','#ffe0b0','#c8cdf0','#b3f0cf'], glow: false, rounded: true,  pattern: false },
+  pixel:  { colors: COLORS, glow: false, rounded: false, pattern: true  },
+};
+const SKIN_KEY = 'tetris-skin';
+
 const PIECES = [
   null,
   [[0,0,0,0],[1,1,1,1],[0,0,0,0],[0,0,0,0]], // I
@@ -56,12 +64,14 @@ const overlayTitle = document.getElementById('overlay-title');
 const overlayScore = document.getElementById('overlay-score');
 const restartBtn = document.getElementById('restart-btn');
 const themeToggleBtn = document.getElementById('theme-toggle');
+const skinSelectEl = document.getElementById('skin-select');
 
 let board, current, next, score, lines, level, paused, gameOver, lastTime, dropAccum, dropInterval, animId;
 let gridColor;
 let bombPending;
 let gravityPending;
 let rayPending;
+let activeSkin = 'retro';
 
 const THEME_KEY = 'tetris-theme';
 
@@ -81,6 +91,24 @@ function initTheme() {
 themeToggleBtn.addEventListener('click', () => {
   applyTheme(document.body.classList.contains('light') ? 'dark' : 'light');
 });
+
+function applySkin(name) {
+  activeSkin = name;
+  localStorage.setItem(SKIN_KEY, name);
+  document.body.classList.toggle('skin-neon', name === 'neon');
+  gridColor = getComputedStyle(document.body).getPropertyValue('--grid-color').trim();
+  draw();
+  drawNext();
+}
+
+function initSkin() {
+  const saved = localStorage.getItem(SKIN_KEY);
+  activeSkin = SKINS[saved] ? saved : 'retro';
+  document.body.classList.toggle('skin-neon', activeSkin === 'neon');
+  skinSelectEl.value = activeSkin;
+}
+
+skinSelectEl.addEventListener('change', e => applySkin(e.target.value));
 
 function createBoard() {
   return Array.from({ length: ROWS }, () => new Array(COLS).fill(0));
@@ -274,13 +302,33 @@ function updateHUD() {
 
 function drawBlock(context, x, y, colorIndex, size, alpha) {
   if (!colorIndex) return;
-  const color = COLORS[colorIndex];
+  const skin = SKINS[activeSkin];
+  const color = skin.colors[colorIndex];
   context.globalAlpha = alpha ?? 1;
   context.fillStyle = color;
-  context.fillRect(x * size + 1, y * size + 1, size - 2, size - 2);
-  // highlight
-  context.fillStyle = 'rgba(255,255,255,0.12)';
-  context.fillRect(x * size + 1, y * size + 1, size - 2, 4);
+  if (skin.glow) {
+    context.shadowBlur = 12;
+    context.shadowColor = color;
+  }
+  if (skin.rounded) {
+    context.beginPath();
+    context.roundRect(x * size + 1, y * size + 1, size - 2, size - 2, 6);
+    context.fill();
+  } else {
+    context.fillRect(x * size + 1, y * size + 1, size - 2, size - 2);
+  }
+  context.shadowBlur = 0;
+  if (skin.pattern) {
+    context.fillStyle = 'rgba(0,0,0,0.15)';
+    for (let i = 0; i < size - 2; i += 6) {
+      context.fillRect(x * size + 1 + i, y * size + 1, 3, size - 2);
+    }
+  }
+  if (!skin.glow) {
+    // highlight
+    context.fillStyle = 'rgba(255,255,255,0.12)';
+    context.fillRect(x * size + 1, y * size + 1, size - 2, 4);
+  }
   if (colorIndex === BOMB_TYPE) {
     const cx = x * size + size / 2;
     const cy = y * size + size / 2 + size * 0.05;
@@ -462,4 +510,5 @@ document.addEventListener('keydown', e => {
 restartBtn.addEventListener('click', init);
 
 initTheme();
+initSkin();
 init();
