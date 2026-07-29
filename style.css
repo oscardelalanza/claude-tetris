@@ -107,6 +107,28 @@ body {
   background: var(--kbd-bg);
 }
 
+#skin-select {
+  background: var(--toggle-bg);
+  border: 1px solid var(--toggle-border);
+  color: var(--toggle-color);
+  border-radius: 6px;
+  height: 32px;
+  padding: 0 8px;
+  font-size: 12px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+#skin-select:hover {
+  background: var(--kbd-bg);
+}
+
+body.skin-neon {
+  --board-bg: #05050a;
+  --grid-color: #14141c;
+}
+
 .game-container {
   display: flex;
   gap: 20px;
