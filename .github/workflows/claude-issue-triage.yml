@@ -23,28 +23,28 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          claude_args: '--allowed-tools "Bash(gh issue edit:*),Bash(gh issue comment:*),Bash(gh label list:*)"'
+          claude_args: |
+            --allowedTools "mcp__github__get_issue,mcp__github__get_issue_comments,mcp__github__update_issue,mcp__github__create_issue_comment,Read,Grep,Glob"
           prompt: |
             Analyze GitHub issue #${{ github.event.issue.number }} in ${{ github.repository }}.
 
-            1. Read the issue title and body carefully.
+            1. Use mcp__github__get_issue to fetch the issue's title, body, and current labels.
 
-            2. Apply the best-matching label(s) to the issue using
-               `gh issue edit ${{ github.event.issue.number }} --add-label "<label>"`.
-               Only choose from this existing, fixed label set — do not create new labels:
-               bug, documentation, duplicate, enhancement, good first issue, help wanted,
+            2. Choose the best-matching label(s) from this fixed set only — do not invent new
+               labels: bug, documentation, duplicate, enhancement, good first issue, help wanted,
                invalid, question, wontfix.
-               If this issue was edited and a previously-applied label from this set no
-               longer fits, remove it with
-               `gh issue edit ${{ github.event.issue.number }} --remove-label "<label>"`.
+               Apply them with mcp__github__update_issue, passing the full desired label set for
+               the issue (this call replaces all labels, so include any still-applicable existing
+               labels from this set and omit ones that no longer fit — this is how edits/reopens
+               should end up dropping stale labels).
 
-            3. Investigate the repository code (index.html, style.css, game.js) as needed
-               to ground your analysis in the actual implementation described in CLAUDE.md
+            3. Use Read/Grep/Glob to inspect index.html, style.css, and game.js as needed to
+               ground your analysis in the actual implementation described in CLAUDE.md
                (board/collision model, rotation/wall-kick, game loop, scoring/level/speed
                coupling, rendering).
 
-            4. Post exactly one diagnostic comment on the issue via
-               `gh issue comment ${{ github.event.issue.number }} --body "..."` containing:
+            4. Post exactly one diagnostic comment via mcp__github__create_issue_comment
+               containing:
                - A concise restatement of the problem
                - The likely root cause
                - The specific file(s)/function(s) involved (e.g. `collide`, `rotateCW`,
