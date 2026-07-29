@@ -47,11 +47,26 @@
       </aside>
     </div>
 
+    <div id="highscores-widget" class="highscores-widget">
+      <h2 class="highscore-heading">Mejores Puntuaciones</h2>
+      <ol id="highscores-list" class="highscore-list"></ol>
+      <button id="reset-scores-btn" class="btn-secondary btn-block">Reiniciar puntuaciones</button>
+    </div>
+
     <div id="overlay" class="overlay hidden">
       <div class="overlay-box">
         <p id="overlay-title">GAME OVER</p>
         <p id="overlay-score"></p>
         <button id="restart-btn">Reiniciar</button>
+        <div id="highscore-entry" class="hidden">
+          <label for="player-name-input">Nombre:</label>
+          <input id="player-name-input" maxlength="10" placeholder="AAA" />
+          <button id="save-score-btn" class="btn-secondary">Guardar</button>
+        </div>
+        <div id="overlay-highscores">
+          <h3 class="highscore-heading highscore-heading-sm">Mejores Puntuaciones</h3>
+          <ol id="overlay-highscores-list" class="highscore-list"></ol>
+        </div>
       </div>
     </div>
   </div>
