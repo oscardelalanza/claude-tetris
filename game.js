@@ -33,6 +33,8 @@ const PIECES = [
 ];
 
 const LINE_SCORES = [0, 100, 300, 500, 800];
+const RING_TYPE = 8;
+const RING_SPAWN_WEIGHT = 0.25; // relative to 1 for each standard piece (1-7)
 const BOMB_TYPE = 9;
 const BOMB_LINE_INTERVAL = 10;
 const GRAVITY_TYPE = 10;
@@ -79,8 +81,19 @@ function createBoard() {
   return Array.from({ length: ROWS }, () => new Array(COLS).fill(0));
 }
 
+function weightedPieceType() {
+  const weights = [1, 1, 1, 1, 1, 1, 1, RING_SPAWN_WEIGHT]; // types 1-8
+  const total = weights.reduce((sum, w) => sum + w, 0);
+  let roll = Math.random() * total;
+  for (let type = 1; type <= weights.length; type++) {
+    roll -= weights[type - 1];
+    if (roll < 0) return type;
+  }
+  return weights.length;
+}
+
 function randomPiece() {
-  const type = Math.floor(Math.random() * 8) + 1;
+  const type = weightedPieceType();
   const shape = PIECES[type].map(row => [...row]);
   return { type, shape, x: Math.floor(COLS / 2) - Math.floor(shape[0].length / 2), y: 0 };
 }

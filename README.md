@@ -180,6 +180,7 @@ Algunos parámetros fáciles de tunear en `game.js`:
 | `dropInterval` | Velocidad inicial de caída en ms         | `1000`                |
 | `BOMB_LINE_INTERVAL` | Líneas eliminadas entre apariciones de la pieza explosiva | `10` |
 | `GRAVITY_LINE_INTERVAL` | Líneas eliminadas entre apariciones de la pieza de gravedad | `15` |
+| `RING_SPAWN_WEIGHT` | Peso relativo de la pieza anillo frente a cada pieza estándar (peso `1`) al elegir pieza aleatoria | `0.25` |
 
 > Si cambias `COLS`, `ROWS` o `BLOCK`, recuerda ajustar también `width` y `height` del `<canvas id="board">` en `index.html` para que coincida (`COLS × BLOCK` × `ROWS × BLOCK`).
 
