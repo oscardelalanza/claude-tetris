@@ -27,6 +27,16 @@
   --toggle-bg: #22223a;
   --toggle-border: #3a3a5a;
   --toggle-color: #e0e0e0;
+  --widget-bg: #1a1a25;
+  --widget-border: #2a2a3a;
+  --highscore-highlight-bg: rgba(122, 162, 247, 0.18);
+  --highscore-highlight-border: #7aa2f7;
+  --input-bg: #22223a;
+  --input-border: #3a3a5a;
+  --input-color: #e0e0e0;
+  --secondary-btn-bg: #22223a;
+  --secondary-btn-fg: #e0e0e0;
+  --secondary-btn-hover: #2f2f4d;
 }
 
 body.light {
@@ -52,6 +62,16 @@ body.light {
   --toggle-bg: #e8e8f0;
   --toggle-border: #c8c8d8;
   --toggle-color: #1a1a25;
+  --widget-bg: #ffffff;
+  --widget-border: #c8c8d8;
+  --highscore-highlight-bg: rgba(63, 95, 191, 0.12);
+  --highscore-highlight-border: #3f5fbf;
+  --input-bg: #ffffff;
+  --input-border: #c8c8d8;
+  --input-color: #1a1a25;
+  --secondary-btn-bg: #e8e8f0;
+  --secondary-btn-fg: #1a1a25;
+  --secondary-btn-hover: #d8d8e8;
 }
 
 body {
@@ -237,4 +257,129 @@ kbd {
 
 #restart-btn:hover {
   background: var(--restart-hover);
+}
+
+/* ---- High scores widget ---- */
+.highscores-widget {
+  margin-top: 16px;
+  padding: 14px 16px;
+  background: var(--widget-bg);
+  border: 1px solid var(--widget-border);
+  border-radius: 6px;
+}
+
+.highscore-heading {
+  font-size: 13px;
+  letter-spacing: 2px;
+  color: var(--label-color);
+  font-weight: 700;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.highscore-heading-sm {
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  margin-bottom: 6px;
+}
+
+.highscore-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.highscore-list li {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 12px;
+  color: var(--fg);
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid transparent;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.highscore-list li.empty {
+  color: var(--label-color);
+  font-family: inherit;
+  text-align: center;
+}
+
+.highscore-list li.highscore-new {
+  background: var(--highscore-highlight-bg);
+  border-color: var(--highscore-highlight-border);
+  color: var(--overlay-score-color);
+  font-weight: 700;
+}
+
+/* ---- Secondary buttons (reuse restart-btn's shape, swap colors) ---- */
+.btn-secondary {
+  background: var(--secondary-btn-bg);
+  color: var(--secondary-btn-fg);
+  border: 1px solid var(--widget-border);
+  border-radius: 6px;
+  padding: 8px 20px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  transition: background 0.15s;
+}
+
+.btn-secondary:hover {
+  background: var(--secondary-btn-hover);
+}
+
+.btn-block {
+  margin-top: 10px;
+  width: 100%;
+  padding: 8px 0;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* ---- High score entry (game over) ---- */
+#highscore-entry {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+/* #highscore-entry's ID selector outranks the generic .hidden class on
+   specificity alone, so the toggle needs this ID+class override to win. */
+#highscore-entry.hidden {
+  display: none;
+}
+
+#highscore-entry label {
+  font-size: 12px;
+  color: var(--fg);
+}
+
+#player-name-input {
+  background: var(--input-bg);
+  color: var(--input-color);
+  border: 1px solid var(--input-border);
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 14px;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  width: 140px;
+}
+
+#player-name-input:focus {
+  outline: none;
+  border-color: var(--restart-bg);
+}
+
+#overlay-highscores {
+  margin-top: 4px;
+  width: 100%;
 }
