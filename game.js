@@ -15,6 +15,7 @@ const COLORS = [
   '#ffb74d', // L - orange
   '#f06292', // R - ring (pink)
   '#ffab40', // bomb (amber)
+  '#5c6bc0', // gravity (indigo)
 ];
 
 const PIECES = [
@@ -28,11 +29,14 @@ const PIECES = [
   [[0,0,7],[7,7,7],[0,0,0]],                  // L
   [[8,8,8],[8,0,8],[8,8,8]],                  // R - ring
   [[9]],                                       // bomb
+  [[10]],                                      // gravity
 ];
 
 const LINE_SCORES = [0, 100, 300, 500, 800];
 const BOMB_TYPE = 9;
 const BOMB_LINE_INTERVAL = 10;
+const GRAVITY_TYPE = 10;
+const GRAVITY_LINE_INTERVAL = 15;
 
 const canvas = document.getElementById('board');
 const ctx = canvas.getContext('2d');
@@ -50,6 +54,7 @@ const themeToggleBtn = document.getElementById('theme-toggle');
 let board, current, next, score, lines, level, paused, gameOver, lastTime, dropAccum, dropInterval, animId;
 let gridColor;
 let bombPending;
+let gravityPending;
 
 const THEME_KEY = 'tetris-theme';
 
@@ -80,15 +85,19 @@ function randomPiece() {
   return { type, shape, x: Math.floor(COLS / 2) - Math.floor(shape[0].length / 2), y: 0 };
 }
 
-function bombPiece() {
-  const shape = PIECES[BOMB_TYPE].map(row => [...row]);
-  return { type: BOMB_TYPE, shape, x: Math.floor(COLS / 2) - Math.floor(shape[0].length / 2), y: 0 };
+function specialPiece(type) {
+  const shape = PIECES[type].map(row => [...row]);
+  return { type, shape, x: Math.floor(COLS / 2) - Math.floor(shape[0].length / 2), y: 0 };
 }
 
 function getNextPiece() {
   if (bombPending) {
     bombPending = false;
-    return bombPiece();
+    return specialPiece(BOMB_TYPE);
+  }
+  if (gravityPending) {
+    gravityPending = false;
+    return specialPiece(GRAVITY_TYPE);
   }
   return randomPiece();
 }
@@ -153,6 +162,9 @@ function clearLines() {
     if (Math.floor(lines / BOMB_LINE_INTERVAL) > Math.floor(prevLines / BOMB_LINE_INTERVAL)) {
       bombPending = true;
     }
+    if (Math.floor(lines / GRAVITY_LINE_INTERVAL) > Math.floor(prevLines / GRAVITY_LINE_INTERVAL)) {
+      gravityPending = true;
+    }
     updateHUD();
   }
 }
@@ -164,6 +176,16 @@ function detonate() {
       const nx = current.x + dc;
       if (ny >= 0 && ny < ROWS && nx >= 0 && nx < COLS) board[ny][nx] = 0;
     }
+}
+
+function applyGravity() {
+  for (let c = 0; c < COLS; c++) {
+    const filled = [];
+    for (let r = 0; r < ROWS; r++) if (board[r][c]) filled.push(board[r][c]);
+    for (let r = ROWS - 1, i = filled.length - 1; r >= 0; r--, i--) {
+      board[r][c] = i >= 0 ? filled[i] : 0;
+    }
+  }
 }
 
 function ghostY() {
@@ -192,6 +214,8 @@ function softDrop() {
 function lockPiece() {
   if (current.type === BOMB_TYPE) {
     detonate();
+  } else if (current.type === GRAVITY_TYPE) {
+    applyGravity();
   } else {
     merge();
   }
@@ -240,6 +264,15 @@ function drawBlock(context, x, y, colorIndex, size, alpha) {
     context.fillStyle = '#ffca28';
     context.beginPath();
     context.arc(cx + size * 0.34, cy - size * 0.36, size * 0.07, 0, Math.PI * 2);
+    context.fill();
+  } else if (colorIndex === GRAVITY_TYPE) {
+    const cx = x * size + size / 2, cy = y * size + size / 2;
+    context.fillStyle = '#1a237e';
+    context.beginPath();
+    context.moveTo(cx - size * 0.22, cy - size * 0.22);
+    context.lineTo(cx + size * 0.22, cy - size * 0.22);
+    context.lineTo(cx, cy + size * 0.24);
+    context.closePath();
     context.fill();
   }
   context.globalAlpha = 1;
@@ -346,6 +379,7 @@ function init() {
   dropInterval = 1000;
   dropAccum = 0;
   bombPending = false;
+  gravityPending = false;
   lastTime = performance.now();
   next = getNextPiece();
   spawn();
